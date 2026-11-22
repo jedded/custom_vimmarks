@@ -324,21 +324,17 @@ function changed() {
 // ---------- mark commands ----------
 
 /**
- * Ask whether the existing mark may be replaced. One key is enough: y = replace, n = keep.
- * Enter and Esc both mean "keep" (the safe answer), so a stray key never destroys a mark.
+ * One-key yes/no question. Resolves to true (y), false (n, or Enter on the default item = the safe
+ * answer) or null (Esc / the box was closed).
  */
-function askOverwrite(letter, existing) {
+function askYesNo(title, placeholder, noText, yesText, detail) {
   return new Promise((resolve) => {
     const qp = vscode.window.createQuickPick();
-    qp.title = `Mark '${letter}' already exists in "${activeProject}"`;
-    qp.placeholder = 'Overwrite it?  Press  y  (yes)  or  n  (no)';
+    qp.title = title;
+    qp.placeholder = placeholder;
     qp.items = [
-      {
-        label: 'n',
-        description: 'No — keep the existing mark',
-        detail: `${baseName(existing.uri)}:${existing.line + 1}   ${(existing.text || '').trim()}`,
-      },
-      { label: 'y', description: 'Yes — move the mark to the current position' },
+      { label: 'n', description: noText, detail },
+      { label: 'y', description: yesText },
     ];
     qp.activeItems = [qp.items[0]];
     let done = false;
@@ -357,9 +353,21 @@ function askOverwrite(letter, existing) {
       const sel = qp.selectedItems[0] || qp.activeItems[0];
       finish(!!sel && sel.label === 'y');
     });
-    qp.onDidHide(() => finish(false));
+    qp.onDidHide(() => finish(null));
     qp.show();
   });
+}
+
+/** Setting a mark whose letter is used elsewhere: y = move it here; n, Enter and Esc keep the old one. */
+async function askOverwrite(letter, existing) {
+  const answer = await askYesNo(
+    `Mark '${letter}' already exists in "${activeProject}"`,
+    'Overwrite it?  Press  y  (yes)  or  n  (no)',
+    'No — keep the existing mark',
+    'Yes — move the mark to the current position',
+    `${baseName(existing.uri)}:${existing.line + 1}   ${(existing.text || '').trim()}`
+  );
+  return answer === true;
 }
 
 function setConfirm(value) {
@@ -604,26 +612,103 @@ function dropProject(name, target) {
   changed();
 }
 
-function dropMark(payload, target) {
+/**
+ * Copy marks (by letter) from one section into another. The source section is left untouched.
+ * Conflicts are decided by the user with one-key y/n questions:
+ *   - another letter already marks the same line in the target  -> "change it to this letter?"
+ *   - the letter is already used at another place in the target -> "overwrite it?"
+ * n / Enter skip that one mark; Esc cancels the whole copy and nothing is changed.
+ */
+async function copyMarks(srcProject, letters, targetProject, beforeLetter) {
+  const picked = lib.sortByCreation(data[srcProject] || []).filter((m) => letters.includes(m.letter));
+  let list = (data[targetProject] || []).map((m) => ({ ...m }));
+  const added = [];
+  let same = 0;
+  let skipped = 0;
+  let n = 0;
+  for (const m of picked) {
+    n += 1;
+    const step = picked.length > 1 ? `  (${n}/${picked.length})` : '';
+    const plan = lib.planCopy(list, m);
+    if (plan.action === 'same') {
+      same += 1;
+      continue;
+    }
+    const here = `${baseName(m.uri)}:${m.line + 1}   ${(m.text || '').trim()}`;
+    if (plan.action === 'relabel') {
+      const yes = await askYesNo(
+        `This line is already marked '${plan.atPlace.letter}' in "${targetProject}"${step}`,
+        `Change that mark to '${m.letter}'?  Press  y  (yes)  or  n  (no)`,
+        'No — leave it as it is (skip this mark)',
+        `Yes — mark this line '${m.letter}' instead of '${plan.atPlace.letter}'`,
+        here
+      );
+      if (yes === null) return say('Copy cancelled — nothing was changed');
+      if (!yes) {
+        skipped += 1;
+        continue;
+      }
+    }
+    if (plan.holder) {
+      const yes = await askYesNo(
+        `Mark '${m.letter}' already exists in "${targetProject}"${step}`,
+        'Overwrite it?  Press  y  (yes)  or  n  (no)',
+        'No — keep the existing mark (skip this mark)',
+        'Yes — replace it with the copied mark',
+        `existing: ${baseName(plan.holder.uri)}:${plan.holder.line + 1}   ${(plan.holder.text || '').trim()}`
+      );
+      if (yes === null) return say('Copy cancelled — nothing was changed');
+      if (!yes) {
+        skipped += 1;
+        continue;
+      }
+    }
+    list = list.filter((x) => x !== plan.atPlace && x !== plan.holder);
+    list.push({ ...m, seq: lib.nextSeq(list) });
+    added.push(m.letter);
+  }
+  if (added.length) {
+    data[targetProject] = list;
+    if (beforeLetter) {
+      const placed = lib.placeBefore(list, added, beforeLetter);
+      if (placed) data[targetProject] = placed;
+    }
+    changed();
+  }
+  const parts = [`${added.length} copied to "${targetProject}"`];
+  if (same) parts.push(`${same} already there`);
+  if (skipped) parts.push(`${skipped} skipped`);
+  say(`Marks: ${parts.join(', ')}`);
+}
+
+async function dropMarks(payload, target) {
+  let targetProject = payload.project; // dropped on empty space: stays in its own section
+  let targetLetter;
+  if (target) {
+    if (target.kind === 'mark') {
+      targetProject = target.project;
+      targetLetter = target.mark.letter;
+    } else if (target.kind === 'project') {
+      targetProject = target.name;
+    } else if (target.kind === 'file') {
+      targetProject = target.project;
+    } else return;
+  }
+  if (targetProject !== payload.project) {
+    // Another section: copy. The position only matters in creation order view.
+    await copyMarks(payload.project, payload.letters, targetProject, sortMode === 'created' ? targetLetter : undefined);
+    return;
+  }
+  // Same section: rearrange.
   if (sortMode !== 'created') {
     say('Marks can only be rearranged in creation order view (press , z to switch)');
     return;
   }
-  let targetProject = payload.project; // dropped on empty space: move to the end of its own section
-  let targetLetter;
-  if (target && target.kind === 'project') {
-    targetProject = target.name; // dropped on a section header: move to the end
-  } else if (target && target.kind === 'mark') {
-    targetProject = target.project;
-    targetLetter = target.mark.letter;
-  } else if (target) {
-    return; // file nodes etc.
-  }
-  if (targetProject !== payload.project) {
-    say('Marks can only be rearranged inside their own section');
-    return;
-  }
-  const next = lib.reorderMarks(data[payload.project] || [], payload.letter, targetLetter);
+  const list = data[payload.project] || [];
+  const next =
+    payload.letters.length === 1
+      ? lib.reorderMarks(list, payload.letters[0], targetLetter)
+      : lib.placeBefore(list, payload.letters, targetLetter);
   if (!next) return;
   data[payload.project] = next;
   changed();
@@ -635,13 +720,26 @@ class MarksDnd {
     this.dropMimeTypes = [DND_MIME];
   }
   handleDrag(source, dataTransfer) {
-    const el = source && source[0];
-    if (!el) return;
+    const els = (source || []).filter(Boolean);
+    if (!els.length) return;
     let payload;
-    if (el.kind === 'project') payload = { kind: 'project', name: el.name };
-    else if (el.kind === 'mark' && sortMode === 'created') {
-      payload = { kind: 'mark', project: el.project, letter: el.mark.letter };
-    } else return; // the by-file view has a fixed order, so marks cannot be dragged there
+    if (els.length === 1 && els[0].kind === 'project') {
+      payload = { kind: 'project', name: els[0].name };
+    } else {
+      // marks, or whole file groups, from the multi-selection
+      const picked = [];
+      for (const el of els) {
+        if (el.kind === 'mark') picked.push({ project: el.project, letter: el.mark.letter });
+        else if (el.kind === 'file') for (const m of el.marks) picked.push({ project: el.project, letter: m.letter });
+      }
+      if (!picked.length) return;
+      const projects = [...new Set(picked.map((x) => x.project))];
+      if (projects.length !== 1) {
+        say('Select marks from one section at a time');
+        return;
+      }
+      payload = { kind: 'marks', project: projects[0], letters: [...new Set(picked.map((x) => x.letter))] };
+    }
     dataTransfer.set(DND_MIME, new vscode.DataTransferItem(JSON.stringify(payload)));
   }
   async handleDrop(target, dataTransfer) {
@@ -654,7 +752,7 @@ class MarksDnd {
       return;
     }
     if (payload.kind === 'project') dropProject(payload.name, target);
-    else if (payload.kind === 'mark') dropMark(payload, target);
+    else if (payload.kind === 'marks') await dropMarks(payload, target);
   }
 }
 
@@ -673,6 +771,7 @@ async function activate(context) {
   treeView = vscode.window.createTreeView('vimMarks.list', {
     treeDataProvider: provider,
     dragAndDropController: new MarksDnd(),
+    canSelectMany: true, // Ctrl/Shift click to pick several marks, then drag them together
   });
   statusItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 50);
   statusItem.command = 'vimMarks.switchProject';

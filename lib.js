@@ -129,6 +129,39 @@ function reorderMarks(marks, letter, targetLetter) {
   return moveItem(sorted, from, to).map((m, i) => ({ ...m, seq: i + 1 }));
 }
 
+/**
+ * Put the marks with the given `letters` right before the mark `targetLetter` (at the end when
+ * targetLetter is undefined), keeping their own relative order, and renumber `seq`.
+ * Returns the new array, or null when the target is missing or the order would not change.
+ */
+function placeBefore(marks, letters, targetLetter) {
+  const sorted = sortByCreation(marks);
+  const moving = sorted.filter((m) => letters.includes(m.letter));
+  const rest = sorted.filter((m) => !letters.includes(m.letter));
+  const at = targetLetter === undefined ? rest.length : rest.findIndex((m) => m.letter === targetLetter);
+  if (at < 0 || !moving.length) return null;
+  const out = [...rest.slice(0, at), ...moving, ...rest.slice(at)];
+  if (out.every((m, i) => m.letter === sorted[i].letter)) return null;
+  return out.map((m, i) => ({ ...m, seq: i + 1 }));
+}
+
+/**
+ * Plan for copying mark `m` into `list` (the marks of the target section):
+ *   { action: 'same' }      the target already has exactly this mark (same letter, file and line)
+ *   { action: 'add' }       nothing is in the way
+ *   { action: 'conflict', holder }   the letter is used at another place (`holder`)
+ *   { action: 'relabel', atPlace, holder }   another letter already marks this very line
+ *                                    (`atPlace`); `holder` is set when the letter is also used elsewhere
+ */
+function planCopy(list, m) {
+  const atPlace = list.find((x) => x.uri === m.uri && x.line === m.line);
+  if (atPlace && atPlace.letter === m.letter) return { action: 'same' };
+  const holder = list.find((x) => x.letter === m.letter && x !== atPlace);
+  if (atPlace) return { action: 'relabel', atPlace, holder };
+  if (holder) return { action: 'conflict', holder };
+  return { action: 'add' };
+}
+
 /** Same for the list of project names. Returns the new order, or null when nothing changes. */
 function reorderNames(order, name, targetName) {
   const from = order.indexOf(name);
@@ -225,6 +258,8 @@ module.exports = {
   moveItem,
   reorderMarks,
   reorderNames,
+  placeBefore,
+  planCopy,
   adjustMarkLine,
   applyChanges,
   relocateLine,

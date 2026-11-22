@@ -1,7 +1,7 @@
 'use strict';
 const assert = require('assert');
 const {
-  isLetter, sortByCreation, groupByFile, normalizeSortMode, nextSeq, adjustMarkLine, applyChanges, decideSetMark, reorderMarks, reorderNames,
+  isLetter, sortByCreation, groupByFile, normalizeSortMode, nextSeq, adjustMarkLine, applyChanges, decideSetMark, reorderMarks, reorderNames, placeBefore, planCopy,
   relocateLine, validateProjectName, uniqueName, parseStore, serializeStore,
 } = require('../lib');
 
@@ -157,6 +157,40 @@ t('reorderMarks works on the creation order even when the array is unsorted', ()
     { letter: 'q', seq: 2 },
   ];
   assert.deepStrictEqual(reorderMarks(ms, 'q', 'a').map((m) => m.letter), ['q', 'a', 'B']);
+});
+
+t('placeBefore: a group goes before the target and keeps its own order', () => {
+  const ms = ['a', 'b', 'c', 'd', 'e'].map((l, i) => ({ letter: l, seq: i + 1 }));
+  const L = (arr) => arr.map((m) => m.letter);
+  assert.deepStrictEqual(L(placeBefore(ms, ['d', 'e'], 'b')), ['a', 'd', 'e', 'b', 'c']);
+  assert.deepStrictEqual(L(placeBefore(ms, ['a', 'b'], 'e')), ['c', 'd', 'a', 'b', 'e']);
+  assert.deepStrictEqual(L(placeBefore(ms, ['a', 'c'])), ['b', 'd', 'e', 'a', 'c']); // to the end
+  assert.deepStrictEqual(placeBefore(ms, ['a', 'c'], 'e').map((m) => m.seq), [1, 2, 3, 4, 5]); // renumbered
+  assert.strictEqual(placeBefore(ms, ['a', 'b'], 'c'), null); // already there
+  assert.strictEqual(placeBefore(ms, ['a', 'b'], 'a'), null); // target is part of the group
+  assert.strictEqual(placeBefore(ms, ['a'], 'z'), null); // unknown target
+  assert.strictEqual(placeBefore(ms, [], 'a'), null);
+});
+
+t('planCopy: same / add / conflict / relabel', () => {
+  const target = [
+    { letter: 'q', uri: 'file:///a.c', line: 2, col: 0 },
+    { letter: 'z', uri: 'file:///b.c', line: 5, col: 0 },
+  ];
+  const mk = (letter, uri, line) => ({ letter, uri, line, col: 0 });
+  assert.deepStrictEqual(planCopy(target, mk('q', 'file:///a.c', 2)), { action: 'same' });
+  assert.deepStrictEqual(planCopy(target, mk('m', 'file:///c.c', 1)), { action: 'add' });
+  const conflict = planCopy(target, mk('z', 'file:///c.c', 1)); // letter z is used at b.c:5
+  assert.strictEqual(conflict.action, 'conflict');
+  assert.strictEqual(conflict.holder, target[1]);
+  const relabel = planCopy(target, mk('m', 'file:///a.c', 2)); // a.c:2 is already marked q
+  assert.strictEqual(relabel.action, 'relabel');
+  assert.strictEqual(relabel.atPlace, target[0]);
+  assert.strictEqual(relabel.holder, undefined);
+  const both = planCopy(target, mk('z', 'file:///a.c', 2)); // line marked q AND letter z used elsewhere
+  assert.strictEqual(both.action, 'relabel');
+  assert.strictEqual(both.atPlace, target[0]);
+  assert.strictEqual(both.holder, target[1]);
 });
 
 t('reorderNames: sections can be rearranged', () => {

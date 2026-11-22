@@ -2,7 +2,7 @@
   "name": "vim-marks-sidebar",
   "displayName": "Vim Marks Sidebar",
   "description": "Vim-style global marks (a-z, A-Z) grouped into projects, with a sidebar list, gutter letters and persistent storage. Designed to be driven by VSCodeVim key bindings.",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "publisher": "local",
   "license": "MIT",
   "engines": {

@@ -460,23 +460,19 @@ const ok = (msg) => console.log('ok -', msg, `(${++n})`);
   await cmd('vimMarks.newProject', 'other');
   at(docB, 1, 0); await cmd('vimMarks.set', 'x');
   await cmd('vimMarks.selectProject', 'default');
-  await drag(markEl('default', 'q'), markEl('other', 'x')); // other section: refused
-  assert.deepStrictEqual(letters(p, 'default'), ['B', 'a', 'q']);
-  assert.deepStrictEqual(letters(p, 'other'), ['x']);
-  assert.ok(S.status.some((m) => /only be rearranged inside their own section/.test(m)));
   await drag(projEl('other'), projEl('default')); // sections can be dragged as well
   assert.deepStrictEqual(names(p), ['other', 'default']);
   await drag(projEl('other'), undefined);
   assert.deepStrictEqual(names(p), ['default', 'other']);
-  ok('marks stay inside their own section; sections themselves can be rearranged');
+  ok('sections themselves can be rearranged');
 
-  await cmd('vimMarks.toggleSort'); // grouped by file: the order is fixed, so marks cannot be dragged
+  await cmd('vimMarks.toggleSort'); // grouped by file: the order is fixed, so rearranging is refused
   const fileNode = p.getChildren({ kind: 'project', name: 'default' })[0];
-  const dtFile = newDT();
-  await dnd.handleDrag([p.getChildren(fileNode)[0]], dtFile);
-  assert.strictEqual(dtFile.get(MIME), undefined);
+  await drag(p.getChildren(fileNode)[0], projEl('default'));
+  assert.ok(S.status.some((m) => /only be rearranged in creation order view/.test(m)));
   await cmd('vimMarks.toggleSort');
-  ok('no mark dragging in the by-file view');
+  assert.deepStrictEqual(letters(p, 'default'), ['B', 'a', 'q']); // unchanged
+  ok('rearranging inside a section is refused in the by-file view');
 
   await ext.deactivate(); // the new order is saved
   ({ ext, p } = await session(new Map(), glS));
@@ -485,6 +481,95 @@ const ok = (msg) => console.log('ok -', msg, `(${++n})`);
   await cmd('vimMarks.set', 'z'); // a new mark goes to the end of the custom order
   assert.deepStrictEqual(letters(p, 'default'), ['B', 'a', 'q', 'z']);
   ok('the dragged order survives a restart; a new mark is added at the end');
+
+  // T. copy marks into another section by dragging (multi-select, one-key y/n questions)
+  await ext.deactivate();
+  fsFiles.clear(); fsMtime.clear();
+  S.prompts.length = 0; S.ask.length = 0;
+  ({ ext, p } = await session(new Map(), new Map()));
+  assert.strictEqual(S.treeView.opts.canSelectMany, true);
+  const dragMany = async (srcs, target) => {
+    const dt = newDT();
+    await dnd2().handleDrag(srcs, dt);
+    await dnd2().handleDrop(target, dt);
+  };
+  const dnd2 = () => S.treeView.opts.dragAndDropController;
+  at(docA, 0, 0); await cmd('vimMarks.set', 'a'); // default: a(a.c:1)  q(a.c:3)  B(b.c:2)
+  at(docA, 2, 0); await cmd('vimMarks.set', 'q');
+  at(docB, 1, 0); await cmd('vimMarks.set', 'B');
+  await cmd('vimMarks.newProject', 'other'); // other: x(b.c:4)  q(b.c:1)  z(a.c:3)
+  at(docB, 3, 0); await cmd('vimMarks.set', 'x');
+  at(docB, 0, 0); await cmd('vimMarks.set', 'q');
+  at(docA, 2, 0); await cmd('vimMarks.set', 'z');
+  await cmd('vimMarks.selectProject', 'default');
+  assert.strictEqual(S.prompts.length, 0);
+
+  await dragMany([markEl('default', 'a')], projEl('other')); // onto the section header: appended, no clash
+  assert.deepStrictEqual(letters(p, 'other'), ['x', 'q', 'z', 'a']);
+  assert.deepStrictEqual(letters(p, 'default'), ['a', 'q', 'B']); // copy: the source keeps its marks
+  assert.strictEqual(S.prompts.length, 0);
+  await dragMany([markEl('default', 'B')], markEl('other', 'x')); // onto a mark: inserted at that place
+  assert.deepStrictEqual(letters(p, 'other'), ['B', 'x', 'q', 'z', 'a']);
+  S.status.length = 0;
+  await dragMany([markEl('default', 'a')], projEl('other')); // already there: nothing to do, no question
+  assert.strictEqual(S.prompts.length, 0);
+  assert.ok(S.status.some((m) => /1 already there/.test(m)), S.status.join('|'));
+  ok('copy: appended on the header, inserted before the target mark, existing copies are left alone');
+
+  // default q = a.c:3 (the line "z" marks in other) and letter q is used at b.c:1 in other -> two questions
+  S.ask.push('esc'); await dragMany([markEl('default', 'q')], projEl('other'));
+  assert.strictEqual(S.prompts.length, 1);
+  assert.ok(/already marked 'z'/.test(S.prompts[0].title), S.prompts[0].title);
+  assert.deepStrictEqual(letters(p, 'other'), ['B', 'x', 'q', 'z', 'a']); // Esc: everything cancelled
+  S.ask.push('n'); await dragMany([markEl('default', 'q')], projEl('other'));
+  assert.strictEqual(S.prompts.length, 2);
+  assert.deepStrictEqual(letters(p, 'other'), ['B', 'x', 'q', 'z', 'a']); // n: skipped
+  S.ask.push('y', 'n'); await dragMany([markEl('default', 'q')], projEl('other'));
+  assert.strictEqual(S.prompts.length, 4);
+  assert.ok(/Mark 'q' already exists/.test(S.prompts[3].title), S.prompts[3].title);
+  assert.deepStrictEqual(letters(p, 'other'), ['B', 'x', 'q', 'z', 'a']); // second answer n: skipped as a whole
+  S.ask.push('y', 'y'); await dragMany([markEl('default', 'q')], projEl('other'));
+  assert.strictEqual(S.prompts.length, 6);
+  assert.deepStrictEqual(letters(p, 'other'), ['B', 'x', 'a', 'q']); // z and the old q are gone, new q added
+  const newQ = markEl('other', 'q').mark;
+  assert.deepStrictEqual([newQ.uri, newQ.line], ['file:///proj/a.c', 2]);
+  assert.deepStrictEqual(letters(p, 'default'), ['a', 'q', 'B']); // the source is untouched
+  assert.strictEqual(S.ask.length, 0);
+  ok('copy asks y/n: line already marked with another letter, and letter already used; Esc cancels all, n skips one');
+
+  // same line, other letter only (no letter clash): "change it?"
+  at(docB, 3, 0); await cmd('vimMarks.set', 'm'); // default: m at b.c:4, where "other" has x
+  S.ask.push('n'); await dragMany([markEl('default', 'm')], projEl('other'));
+  assert.ok(markEl('other', 'x') && !markEl('other', 'm'));
+  S.ask.push('y'); await dragMany([markEl('default', 'm')], projEl('other'));
+  assert.ok(!markEl('other', 'x') && markEl('other', 'm'));
+  ok('copy onto a line that another letter marks: n leaves it, y relabels it');
+
+  // multi-select: several marks at once
+  await cmd('vimMarks.newProject', 'third');
+  await cmd('vimMarks.selectProject', 'default');
+  S.prompts.length = 0;
+  await dragMany([markEl('default', 'm'), markEl('default', 'B'), markEl('default', 'q')], projEl('third'));
+  assert.deepStrictEqual(letters(p, 'third'), ['q', 'B', 'm']); // source creation order: q, B, m
+  assert.strictEqual(S.prompts.length, 0);
+  ok('several selected marks are copied together');
+
+  S.status.length = 0;
+  await dragMany([markEl('default', 'a'), markEl('other', 'B')], projEl('third')); // from two sections
+  assert.ok(S.status.some((m) => /one section at a time/.test(m)));
+  assert.deepStrictEqual(letters(p, 'third'), ['q', 'B', 'm']);
+  await dragMany([markEl('third', 'm'), markEl('third', 'B')], markEl('third', 'q')); // group inside one section
+  assert.deepStrictEqual(letters(p, 'third'), ['B', 'm', 'q']);
+  ok('selection from two sections is refused; a selected group can be rearranged inside its section');
+
+  await cmd('vimMarks.newProject', 'fourth'); // whole file groups can be dragged in the by-file view
+  await cmd('vimMarks.selectProject', 'default');
+  await cmd('vimMarks.toggleSort');
+  const fileB = p.getChildren({ kind: 'project', name: 'default' }).find((f) => f.uri === 'file:///proj/b.c');
+  await dragMany([fileB], projEl('fourth'));
+  await cmd('vimMarks.toggleSort');
+  assert.deepStrictEqual(letters(p, 'fourth').sort(), ['B', 'm']);
+  ok('a file group dragged in the by-file view copies all of its marks');
 
   // Q. old marks must never overwrite existing ones (same letters in another workspace)
   await ext.deactivate();
