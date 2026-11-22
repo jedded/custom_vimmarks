@@ -1,0 +1,1048 @@
+{
+  "name": "vim-marks-sidebar",
+  "displayName": "Vim Marks Sidebar",
+  "description": "Global Vim-style marks (a-z, A-Z) with a sidebar list, gutter letters and a sort toggle. Designed to be driven by VSCodeVim key bindings.",
+  "version": "0.2.0",
+  "publisher": "local",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.88.0"
+  },
+  "extensionKind": [
+    "workspace"
+  ],
+  "categories": [
+    "Other"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "vimMarks",
+          "title": "Marks",
+          "icon": "media/marks.svg"
+        }
+      ]
+    },
+    "views": {
+      "vimMarks": [
+        {
+          "id": "vimMarks.list",
+          "name": "Marks"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "vimMarks.set",
+        "title": "Vim Marks: Set Mark"
+      },
+      {
+        "command": "vimMarks.jump",
+        "title": "Vim Marks: Jump to Mark (line)"
+      },
+      {
+        "command": "vimMarks.jumpExact",
+        "title": "Vim Marks: Jump to Mark (exact position)"
+      },
+      {
+        "command": "vimMarks.toggleSort",
+        "title": "Vim Marks: Toggle Sort (creation order / letter)",
+        "icon": "$(list-ordered)"
+      },
+      {
+        "command": "vimMarks.delete",
+        "title": "Vim Marks: Delete Mark",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "vimMarks.clear",
+        "title": "Vim Marks: Delete All Marks",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "vimMarks.open",
+        "title": "Vim Marks: Open Mark"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "vimMarks.open",
+          "when": "false"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "vimMarks.toggleSort",
+          "when": "view == vimMarks.list",
+          "group": "navigation@1"
+        },
+        {
+          "command": "vimMarks.clear",
+          "when": "view == vimMarks.list",
+          "group": "navigation@2"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "vimMarks.delete",
+          "when": "view == vimMarks.list && viewItem == mark",
+          "group": "inline"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "key": "m a",
+        "command": "vimMarks.set",
+        "args": "a",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' a",
+        "command": "vimMarks.jump",
+        "args": "a",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` a",
+        "command": "vimMarks.jumpExact",
+        "args": "a",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m b",
+        "command": "vimMarks.set",
+        "args": "b",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' b",
+        "command": "vimMarks.jump",
+        "args": "b",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` b",
+        "command": "vimMarks.jumpExact",
+        "args": "b",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m c",
+        "command": "vimMarks.set",
+        "args": "c",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' c",
+        "command": "vimMarks.jump",
+        "args": "c",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` c",
+        "command": "vimMarks.jumpExact",
+        "args": "c",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m d",
+        "command": "vimMarks.set",
+        "args": "d",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' d",
+        "command": "vimMarks.jump",
+        "args": "d",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` d",
+        "command": "vimMarks.jumpExact",
+        "args": "d",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m e",
+        "command": "vimMarks.set",
+        "args": "e",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' e",
+        "command": "vimMarks.jump",
+        "args": "e",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` e",
+        "command": "vimMarks.jumpExact",
+        "args": "e",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m f",
+        "command": "vimMarks.set",
+        "args": "f",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' f",
+        "command": "vimMarks.jump",
+        "args": "f",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` f",
+        "command": "vimMarks.jumpExact",
+        "args": "f",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m g",
+        "command": "vimMarks.set",
+        "args": "g",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' g",
+        "command": "vimMarks.jump",
+        "args": "g",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` g",
+        "command": "vimMarks.jumpExact",
+        "args": "g",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m h",
+        "command": "vimMarks.set",
+        "args": "h",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' h",
+        "command": "vimMarks.jump",
+        "args": "h",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` h",
+        "command": "vimMarks.jumpExact",
+        "args": "h",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m i",
+        "command": "vimMarks.set",
+        "args": "i",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' i",
+        "command": "vimMarks.jump",
+        "args": "i",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` i",
+        "command": "vimMarks.jumpExact",
+        "args": "i",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m j",
+        "command": "vimMarks.set",
+        "args": "j",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' j",
+        "command": "vimMarks.jump",
+        "args": "j",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` j",
+        "command": "vimMarks.jumpExact",
+        "args": "j",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m k",
+        "command": "vimMarks.set",
+        "args": "k",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' k",
+        "command": "vimMarks.jump",
+        "args": "k",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` k",
+        "command": "vimMarks.jumpExact",
+        "args": "k",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m l",
+        "command": "vimMarks.set",
+        "args": "l",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' l",
+        "command": "vimMarks.jump",
+        "args": "l",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` l",
+        "command": "vimMarks.jumpExact",
+        "args": "l",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m m",
+        "command": "vimMarks.set",
+        "args": "m",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' m",
+        "command": "vimMarks.jump",
+        "args": "m",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` m",
+        "command": "vimMarks.jumpExact",
+        "args": "m",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m n",
+        "command": "vimMarks.set",
+        "args": "n",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' n",
+        "command": "vimMarks.jump",
+        "args": "n",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` n",
+        "command": "vimMarks.jumpExact",
+        "args": "n",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m o",
+        "command": "vimMarks.set",
+        "args": "o",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' o",
+        "command": "vimMarks.jump",
+        "args": "o",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` o",
+        "command": "vimMarks.jumpExact",
+        "args": "o",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m p",
+        "command": "vimMarks.set",
+        "args": "p",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' p",
+        "command": "vimMarks.jump",
+        "args": "p",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` p",
+        "command": "vimMarks.jumpExact",
+        "args": "p",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m q",
+        "command": "vimMarks.set",
+        "args": "q",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' q",
+        "command": "vimMarks.jump",
+        "args": "q",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` q",
+        "command": "vimMarks.jumpExact",
+        "args": "q",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m r",
+        "command": "vimMarks.set",
+        "args": "r",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' r",
+        "command": "vimMarks.jump",
+        "args": "r",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` r",
+        "command": "vimMarks.jumpExact",
+        "args": "r",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m s",
+        "command": "vimMarks.set",
+        "args": "s",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' s",
+        "command": "vimMarks.jump",
+        "args": "s",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` s",
+        "command": "vimMarks.jumpExact",
+        "args": "s",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m t",
+        "command": "vimMarks.set",
+        "args": "t",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' t",
+        "command": "vimMarks.jump",
+        "args": "t",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` t",
+        "command": "vimMarks.jumpExact",
+        "args": "t",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m u",
+        "command": "vimMarks.set",
+        "args": "u",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' u",
+        "command": "vimMarks.jump",
+        "args": "u",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` u",
+        "command": "vimMarks.jumpExact",
+        "args": "u",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m v",
+        "command": "vimMarks.set",
+        "args": "v",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' v",
+        "command": "vimMarks.jump",
+        "args": "v",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` v",
+        "command": "vimMarks.jumpExact",
+        "args": "v",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m w",
+        "command": "vimMarks.set",
+        "args": "w",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' w",
+        "command": "vimMarks.jump",
+        "args": "w",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` w",
+        "command": "vimMarks.jumpExact",
+        "args": "w",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m x",
+        "command": "vimMarks.set",
+        "args": "x",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' x",
+        "command": "vimMarks.jump",
+        "args": "x",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` x",
+        "command": "vimMarks.jumpExact",
+        "args": "x",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m y",
+        "command": "vimMarks.set",
+        "args": "y",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' y",
+        "command": "vimMarks.jump",
+        "args": "y",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` y",
+        "command": "vimMarks.jumpExact",
+        "args": "y",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m z",
+        "command": "vimMarks.set",
+        "args": "z",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' z",
+        "command": "vimMarks.jump",
+        "args": "z",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` z",
+        "command": "vimMarks.jumpExact",
+        "args": "z",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+a",
+        "command": "vimMarks.set",
+        "args": "A",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+a",
+        "command": "vimMarks.jump",
+        "args": "A",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+a",
+        "command": "vimMarks.jumpExact",
+        "args": "A",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+b",
+        "command": "vimMarks.set",
+        "args": "B",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+b",
+        "command": "vimMarks.jump",
+        "args": "B",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+b",
+        "command": "vimMarks.jumpExact",
+        "args": "B",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+c",
+        "command": "vimMarks.set",
+        "args": "C",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+c",
+        "command": "vimMarks.jump",
+        "args": "C",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+c",
+        "command": "vimMarks.jumpExact",
+        "args": "C",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+d",
+        "command": "vimMarks.set",
+        "args": "D",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+d",
+        "command": "vimMarks.jump",
+        "args": "D",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+d",
+        "command": "vimMarks.jumpExact",
+        "args": "D",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+e",
+        "command": "vimMarks.set",
+        "args": "E",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+e",
+        "command": "vimMarks.jump",
+        "args": "E",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+e",
+        "command": "vimMarks.jumpExact",
+        "args": "E",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+f",
+        "command": "vimMarks.set",
+        "args": "F",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+f",
+        "command": "vimMarks.jump",
+        "args": "F",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+f",
+        "command": "vimMarks.jumpExact",
+        "args": "F",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+g",
+        "command": "vimMarks.set",
+        "args": "G",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+g",
+        "command": "vimMarks.jump",
+        "args": "G",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+g",
+        "command": "vimMarks.jumpExact",
+        "args": "G",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+h",
+        "command": "vimMarks.set",
+        "args": "H",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+h",
+        "command": "vimMarks.jump",
+        "args": "H",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+h",
+        "command": "vimMarks.jumpExact",
+        "args": "H",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+i",
+        "command": "vimMarks.set",
+        "args": "I",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+i",
+        "command": "vimMarks.jump",
+        "args": "I",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+i",
+        "command": "vimMarks.jumpExact",
+        "args": "I",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+j",
+        "command": "vimMarks.set",
+        "args": "J",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+j",
+        "command": "vimMarks.jump",
+        "args": "J",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+j",
+        "command": "vimMarks.jumpExact",
+        "args": "J",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+k",
+        "command": "vimMarks.set",
+        "args": "K",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+k",
+        "command": "vimMarks.jump",
+        "args": "K",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+k",
+        "command": "vimMarks.jumpExact",
+        "args": "K",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+l",
+        "command": "vimMarks.set",
+        "args": "L",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+l",
+        "command": "vimMarks.jump",
+        "args": "L",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+l",
+        "command": "vimMarks.jumpExact",
+        "args": "L",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+m",
+        "command": "vimMarks.set",
+        "args": "M",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+m",
+        "command": "vimMarks.jump",
+        "args": "M",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+m",
+        "command": "vimMarks.jumpExact",
+        "args": "M",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+n",
+        "command": "vimMarks.set",
+        "args": "N",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+n",
+        "command": "vimMarks.jump",
+        "args": "N",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+n",
+        "command": "vimMarks.jumpExact",
+        "args": "N",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+o",
+        "command": "vimMarks.set",
+        "args": "O",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+o",
+        "command": "vimMarks.jump",
+        "args": "O",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+o",
+        "command": "vimMarks.jumpExact",
+        "args": "O",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+p",
+        "command": "vimMarks.set",
+        "args": "P",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+p",
+        "command": "vimMarks.jump",
+        "args": "P",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+p",
+        "command": "vimMarks.jumpExact",
+        "args": "P",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+q",
+        "command": "vimMarks.set",
+        "args": "Q",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+q",
+        "command": "vimMarks.jump",
+        "args": "Q",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+q",
+        "command": "vimMarks.jumpExact",
+        "args": "Q",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+r",
+        "command": "vimMarks.set",
+        "args": "R",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+r",
+        "command": "vimMarks.jump",
+        "args": "R",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+r",
+        "command": "vimMarks.jumpExact",
+        "args": "R",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+s",
+        "command": "vimMarks.set",
+        "args": "S",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+s",
+        "command": "vimMarks.jump",
+        "args": "S",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+s",
+        "command": "vimMarks.jumpExact",
+        "args": "S",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+t",
+        "command": "vimMarks.set",
+        "args": "T",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+t",
+        "command": "vimMarks.jump",
+        "args": "T",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+t",
+        "command": "vimMarks.jumpExact",
+        "args": "T",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+u",
+        "command": "vimMarks.set",
+        "args": "U",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+u",
+        "command": "vimMarks.jump",
+        "args": "U",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+u",
+        "command": "vimMarks.jumpExact",
+        "args": "U",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+v",
+        "command": "vimMarks.set",
+        "args": "V",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+v",
+        "command": "vimMarks.jump",
+        "args": "V",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+v",
+        "command": "vimMarks.jumpExact",
+        "args": "V",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+w",
+        "command": "vimMarks.set",
+        "args": "W",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+w",
+        "command": "vimMarks.jump",
+        "args": "W",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+w",
+        "command": "vimMarks.jumpExact",
+        "args": "W",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+x",
+        "command": "vimMarks.set",
+        "args": "X",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+x",
+        "command": "vimMarks.jump",
+        "args": "X",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+x",
+        "command": "vimMarks.jumpExact",
+        "args": "X",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+y",
+        "command": "vimMarks.set",
+        "args": "Y",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+y",
+        "command": "vimMarks.jump",
+        "args": "Y",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+y",
+        "command": "vimMarks.jumpExact",
+        "args": "Y",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "m shift+z",
+        "command": "vimMarks.set",
+        "args": "Z",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "' shift+z",
+        "command": "vimMarks.jump",
+        "args": "Z",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "` shift+z",
+        "command": "vimMarks.jumpExact",
+        "args": "Z",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": ", z",
+        "command": "vimMarks.toggleSort",
+        "when": "vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": ", v",
+        "command": "vimMarks.list.focus",
+        "when": "vim.active && vim.mode == 'Normal'"
+      }
+    ]
+  }
+}
