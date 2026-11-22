@@ -1,8 +1,8 @@
 {
   "name": "vim-marks-sidebar",
   "displayName": "Vim Marks Sidebar",
-  "description": "Global Vim-style marks (a-z, A-Z) with a sidebar list, gutter letters and a sort toggle. Designed to be driven by VSCodeVim key bindings.",
-  "version": "0.2.0",
+  "description": "Vim-style global marks (a-z, A-Z) grouped into projects, with a sidebar list, gutter letters and persistent storage. Designed to be driven by VSCodeVim key bindings.",
+  "version": "0.3.2",
   "publisher": "local",
   "license": "MIT",
   "engines": {
@@ -50,9 +50,13 @@
         "title": "Vim Marks: Jump to Mark (exact position)"
       },
       {
+        "command": "vimMarks.open",
+        "title": "Vim Marks: Open Mark"
+      },
+      {
         "command": "vimMarks.toggleSort",
-        "title": "Vim Marks: Toggle Sort (creation order / letter)",
-        "icon": "$(list-ordered)"
+        "title": "Vim Marks: Toggle View (creation order / grouped by file)",
+        "icon": "$(list-tree)"
       },
       {
         "command": "vimMarks.delete",
@@ -61,12 +65,31 @@
       },
       {
         "command": "vimMarks.clear",
-        "title": "Vim Marks: Delete All Marks",
+        "title": "Vim Marks: Delete All Marks in Current Project",
         "icon": "$(clear-all)"
       },
       {
-        "command": "vimMarks.open",
-        "title": "Vim Marks: Open Mark"
+        "command": "vimMarks.selectProject",
+        "title": "Vim Marks: Select Project"
+      },
+      {
+        "command": "vimMarks.switchProject",
+        "title": "Vim Marks: Switch Project"
+      },
+      {
+        "command": "vimMarks.newProject",
+        "title": "Vim Marks: New Project",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vimMarks.renameProject",
+        "title": "Vim Marks: Rename Project",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "vimMarks.deleteProject",
+        "title": "Vim Marks: Delete Project",
+        "icon": "$(trash)"
       }
     ],
     "menus": {
@@ -74,9 +97,22 @@
         {
           "command": "vimMarks.open",
           "when": "false"
+        },
+        {
+          "command": "vimMarks.selectProject",
+          "when": "false"
+        },
+        {
+          "command": "vimMarks.delete",
+          "when": "false"
         }
       ],
       "view/title": [
+        {
+          "command": "vimMarks.newProject",
+          "when": "view == vimMarks.list",
+          "group": "navigation@0"
+        },
         {
           "command": "vimMarks.toggleSort",
           "when": "view == vimMarks.list",
@@ -92,7 +128,17 @@
         {
           "command": "vimMarks.delete",
           "when": "view == vimMarks.list && viewItem == mark",
-          "group": "inline"
+          "group": "inline@0"
+        },
+        {
+          "command": "vimMarks.renameProject",
+          "when": "view == vimMarks.list && viewItem == project",
+          "group": "inline@0"
+        },
+        {
+          "command": "vimMarks.deleteProject",
+          "when": "view == vimMarks.list && viewItem == project",
+          "group": "inline@1"
         }
       ]
     },
@@ -1041,6 +1087,11 @@
       {
         "key": ", v",
         "command": "vimMarks.list.focus",
+        "when": "vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": ", p",
+        "command": "vimMarks.switchProject",
         "when": "vim.active && vim.mode == 'Normal'"
       }
     ]

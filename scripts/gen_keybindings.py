@@ -30,6 +30,7 @@ for l in string.ascii_lowercase + string.ascii_uppercase:
 
 bindings.append({"key": ", z", "command": "vimMarks.toggleSort", "when": WHEN_ANY})
 bindings.append({"key": ", v", "command": "vimMarks.list.focus", "when": WHEN_ANY})
+bindings.append({"key": ", p", "command": "vimMarks.switchProject", "when": WHEN_ANY})
 
 pkg["contributes"]["keybindings"] = bindings
 with open(path, "w", encoding="utf-8") as f:
