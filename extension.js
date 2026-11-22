@@ -5,10 +5,13 @@ const lib = require('./lib');
 const KEY_ACTIVE_WS = 'vimMarks.activeProject'; // workspaceState: project used by this workspace
 const KEY_LAST = 'vimMarks.lastProject'; // globalState: last selected project (fallback)
 const KEY_SORT = 'vimMarks.sort'; // workspaceState
+const KEY_CONFIRM = 'vimMarks.confirmOverwrite'; // globalState: ask before replacing a mark (default on)
 const KEY_OLD_MARKS = 'vimMarks.marks'; // workspaceState of v0.1/v0.2 (copied once, never deleted)
 const KEY_MIGRATED = 'vimMarks.migrated'; // workspaceState flag: old marks were already copied
 const DEFAULT_PROJECT = 'default';
 const STORE_FILE = 'marks.json';
+// Tree drag & drop uses a mime type derived from the view id: application/vnd.code.tree.<viewid lower-cased>
+const DND_MIME = 'application/vnd.code.tree.vimmarks.list';
 
 let ctx;
 let provider;
@@ -22,6 +25,7 @@ let order = [];
 let data = {};
 let activeProject = DEFAULT_PROJECT;
 let sortMode = 'created';
+let confirmOverwrite = true;
 
 let saveTimer;
 let dirty = false;
@@ -302,7 +306,9 @@ class MarksProvider {
 function refreshView() {
   provider.refresh();
   treeView.title = `Marks · ${activeProject}`;
-  treeView.description = sortMode === 'created' ? 'creation order' : 'grouped by file';
+  treeView.description =
+    (sortMode === 'created' ? 'creation order' : 'grouped by file') +
+    ` · overwrite: ${confirmOverwrite ? 'ask' : 'no ask'}`;
   const any = order.some((p) => (data[p] || []).length);
   treeView.message = any ? undefined : 'No marks yet. In normal mode press m{letter} to set one.';
   statusItem.text = `$(bookmark) ${activeProject}`;
@@ -317,6 +323,53 @@ function changed() {
 
 // ---------- mark commands ----------
 
+/**
+ * Ask whether the existing mark may be replaced. One key is enough: y = replace, n = keep.
+ * Enter and Esc both mean "keep" (the safe answer), so a stray key never destroys a mark.
+ */
+function askOverwrite(letter, existing) {
+  return new Promise((resolve) => {
+    const qp = vscode.window.createQuickPick();
+    qp.title = `Mark '${letter}' already exists in "${activeProject}"`;
+    qp.placeholder = 'Overwrite it?  Press  y  (yes)  or  n  (no)';
+    qp.items = [
+      {
+        label: 'n',
+        description: 'No — keep the existing mark',
+        detail: `${baseName(existing.uri)}:${existing.line + 1}   ${(existing.text || '').trim()}`,
+      },
+      { label: 'y', description: 'Yes — move the mark to the current position' },
+    ];
+    qp.activeItems = [qp.items[0]];
+    let done = false;
+    const finish = (answer) => {
+      if (done) return;
+      done = true;
+      resolve(answer);
+      qp.dispose();
+    };
+    qp.onDidChangeValue((v) => {
+      const k = v.trim().toLowerCase();
+      if (k === 'y') finish(true);
+      else if (k === 'n') finish(false);
+    });
+    qp.onDidAccept(() => {
+      const sel = qp.selectedItems[0] || qp.activeItems[0];
+      finish(!!sel && sel.label === 'y');
+    });
+    qp.onDidHide(() => finish(false));
+    qp.show();
+  });
+}
+
+function setConfirm(value) {
+  confirmOverwrite = value;
+  ctx.globalState.update(KEY_CONFIRM, value);
+  vscode.commands.executeCommand('setContext', 'vimMarks.overwriteConfirmOff', !value);
+  say(`Overwrite confirmation: ${value ? 'on' : 'off'}`);
+  refreshView();
+}
+
 async function setMark(arg) {
   let letter = arg;
   if (letter === undefined) {
@@ -330,6 +383,22 @@ async function setMark(arg) {
   if (!editor) return;
   const pos = editor.selection.active;
   const doc = editor.document;
+  const existing = curMarks().find((m) => m.letter === letter);
+  const action = lib.decideSetMark(existing, doc.uri.toString(), pos.line, confirmOverwrite);
+  if (action === 'remove') {
+    // Pressing the same letter again on the same line toggles the mark off.
+    data[activeProject] = curMarks().filter((m) => m.letter !== letter);
+    say(`[${activeProject}] mark '${letter}' removed from ${baseName(existing.uri)}:${existing.line + 1} (press again to set it)`);
+    changed();
+    return;
+  }
+  if (action === 'ask') {
+    const yes = await askOverwrite(letter, existing);
+    if (!yes) {
+      say(`Mark '${letter}' kept at ${baseName(existing.uri)}:${existing.line + 1}`);
+      return;
+    }
+  }
   const list = curMarks().filter((m) => m.letter !== letter);
   list.push({
     letter,
@@ -524,17 +593,87 @@ async function deleteProject(arg) {
   changed();
 }
 
+// ---------- drag & drop in the sidebar ----------
+
+function dropProject(name, target) {
+  let targetName;
+  if (target) targetName = target.kind === 'project' ? target.name : target.project;
+  const next = lib.reorderNames(order, name, targetName);
+  if (!next) return;
+  order = next;
+  changed();
+}
+
+function dropMark(payload, target) {
+  if (sortMode !== 'created') {
+    say('Marks can only be rearranged in creation order view (press , z to switch)');
+    return;
+  }
+  let targetProject = payload.project; // dropped on empty space: move to the end of its own section
+  let targetLetter;
+  if (target && target.kind === 'project') {
+    targetProject = target.name; // dropped on a section header: move to the end
+  } else if (target && target.kind === 'mark') {
+    targetProject = target.project;
+    targetLetter = target.mark.letter;
+  } else if (target) {
+    return; // file nodes etc.
+  }
+  if (targetProject !== payload.project) {
+    say('Marks can only be rearranged inside their own section');
+    return;
+  }
+  const next = lib.reorderMarks(data[payload.project] || [], payload.letter, targetLetter);
+  if (!next) return;
+  data[payload.project] = next;
+  changed();
+}
+
+class MarksDnd {
+  constructor() {
+    this.dragMimeTypes = [DND_MIME];
+    this.dropMimeTypes = [DND_MIME];
+  }
+  handleDrag(source, dataTransfer) {
+    const el = source && source[0];
+    if (!el) return;
+    let payload;
+    if (el.kind === 'project') payload = { kind: 'project', name: el.name };
+    else if (el.kind === 'mark' && sortMode === 'created') {
+      payload = { kind: 'mark', project: el.project, letter: el.mark.letter };
+    } else return; // the by-file view has a fixed order, so marks cannot be dragged there
+    dataTransfer.set(DND_MIME, new vscode.DataTransferItem(JSON.stringify(payload)));
+  }
+  async handleDrop(target, dataTransfer) {
+    const item = dataTransfer.get(DND_MIME);
+    if (!item) return;
+    let payload;
+    try {
+      payload = JSON.parse(await item.asString());
+    } catch (e) {
+      return;
+    }
+    if (payload.kind === 'project') dropProject(payload.name, target);
+    else if (payload.kind === 'mark') dropMark(payload, target);
+  }
+}
+
 // ---------- activation ----------
 
 async function activate(context) {
   ctx = context;
   sortMode = lib.normalizeSortMode(ctx.workspaceState.get(KEY_SORT));
+  confirmOverwrite = ctx.globalState.get(KEY_CONFIRM, true) !== false;
+  vscode.commands.executeCommand('setContext', 'vimMarks.overwriteConfirmOff', !confirmOverwrite);
   await loadStore();
   migrateOldMarks();
   chooseActive();
 
   provider = new MarksProvider();
-  treeView = vscode.window.createTreeView('vimMarks.list', { treeDataProvider: provider });
+  treeView = vscode.window.createTreeView('vimMarks.list', {
+    treeDataProvider: provider,
+    dragAndDropController: new MarksDnd(),
+  });
   statusItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 50);
   statusItem.command = 'vimMarks.switchProject';
   statusItem.show();
@@ -554,6 +693,9 @@ async function activate(context) {
     }),
     vscode.commands.registerCommand('vimMarks.delete', deleteMark),
     vscode.commands.registerCommand('vimMarks.clear', clearActive),
+    vscode.commands.registerCommand('vimMarks.enableConfirm', () => setConfirm(true)),
+    vscode.commands.registerCommand('vimMarks.disableConfirm', () => setConfirm(false)),
+    vscode.commands.registerCommand('vimMarks.toggleConfirm', () => setConfirm(!confirmOverwrite)),
     vscode.commands.registerCommand('vimMarks.selectProject', selectProject),
     vscode.commands.registerCommand('vimMarks.switchProject', switchProject),
     vscode.commands.registerCommand('vimMarks.newProject', newProject),

@@ -2,7 +2,7 @@
   "name": "vim-marks-sidebar",
   "displayName": "Vim Marks Sidebar",
   "description": "Vim-style global marks (a-z, A-Z) grouped into projects, with a sidebar list, gutter letters and persistent storage. Designed to be driven by VSCodeVim key bindings.",
-  "version": "0.3.2",
+  "version": "0.5.0",
   "publisher": "local",
   "license": "MIT",
   "engines": {
@@ -90,6 +90,20 @@
         "command": "vimMarks.deleteProject",
         "title": "Vim Marks: Delete Project",
         "icon": "$(trash)"
+      },
+      {
+        "command": "vimMarks.disableConfirm",
+        "title": "Vim Marks: Turn Off Overwrite Confirmation",
+        "icon": "$(shield)"
+      },
+      {
+        "command": "vimMarks.enableConfirm",
+        "title": "Vim Marks: Turn On Overwrite Confirmation",
+        "icon": "$(circle-slash)"
+      },
+      {
+        "command": "vimMarks.toggleConfirm",
+        "title": "Vim Marks: Toggle Overwrite Confirmation"
       }
     ],
     "menus": {
@@ -105,6 +119,14 @@
         {
           "command": "vimMarks.delete",
           "when": "false"
+        },
+        {
+          "command": "vimMarks.disableConfirm",
+          "when": "!vimMarks.overwriteConfirmOff"
+        },
+        {
+          "command": "vimMarks.enableConfirm",
+          "when": "vimMarks.overwriteConfirmOff"
         }
       ],
       "view/title": [
@@ -122,6 +144,16 @@
           "command": "vimMarks.clear",
           "when": "view == vimMarks.list",
           "group": "navigation@2"
+        },
+        {
+          "command": "vimMarks.disableConfirm",
+          "when": "view == vimMarks.list && !vimMarks.overwriteConfirmOff",
+          "group": "navigation@3"
+        },
+        {
+          "command": "vimMarks.enableConfirm",
+          "when": "view == vimMarks.list && vimMarks.overwriteConfirmOff",
+          "group": "navigation@3"
         }
       ],
       "view/item/context": [

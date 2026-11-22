@@ -93,6 +93,50 @@ function relocateLine(getText, lineCount, line, text, radius = 300) {
   return line;
 }
 
+/**
+ * What should "m<letter>" do on this line?
+ *   'new'     the letter is unused: create the mark
+ *   'remove'  the letter already marks THIS line (same file and line): remove it (toggle off)
+ *   'ask'     the letter marks another place and the confirmation is on
+ *   'replace' the letter marks another place and the confirmation is off
+ */
+function decideSetMark(existing, uriString, line, confirmOn) {
+  if (!existing) return 'new';
+  if (existing.uri === uriString && existing.line === line) return 'remove';
+  return confirmOn ? 'ask' : 'replace';
+}
+
+// ---------- reordering (drag and drop) ----------
+
+/** Copy of `list` with the item at `from` moved so that it ends up at index `to`. */
+function moveItem(list, from, to) {
+  const arr = list.slice();
+  const [item] = arr.splice(from, 1);
+  arr.splice(to, 0, item);
+  return arr;
+}
+
+/**
+ * Move the mark `letter` to where `targetLetter` is (to the end when targetLetter is undefined),
+ * then renumber `seq` so the creation-order list shows exactly this order.
+ * Returns the new array, or null when nothing would change.
+ */
+function reorderMarks(marks, letter, targetLetter) {
+  const sorted = sortByCreation(marks);
+  const from = sorted.findIndex((m) => m.letter === letter);
+  const to = targetLetter === undefined ? sorted.length - 1 : sorted.findIndex((m) => m.letter === targetLetter);
+  if (from < 0 || to < 0 || from === to) return null;
+  return moveItem(sorted, from, to).map((m, i) => ({ ...m, seq: i + 1 }));
+}
+
+/** Same for the list of project names. Returns the new order, or null when nothing changes. */
+function reorderNames(order, name, targetName) {
+  const from = order.indexOf(name);
+  const to = targetName === undefined ? order.length - 1 : order.indexOf(targetName);
+  if (from < 0 || to < 0 || from === to) return null;
+  return moveItem(order, from, to);
+}
+
 // ---------- projects ----------
 
 /** Returns an error message, or undefined when the name is fine. */
@@ -177,6 +221,10 @@ module.exports = {
   groupByFile,
   normalizeSortMode,
   nextSeq,
+  decideSetMark,
+  moveItem,
+  reorderMarks,
+  reorderNames,
   adjustMarkLine,
   applyChanges,
   relocateLine,

@@ -1,7 +1,7 @@
 'use strict';
 const assert = require('assert');
 const {
-  isLetter, sortByCreation, groupByFile, normalizeSortMode, nextSeq, adjustMarkLine, applyChanges,
+  isLetter, sortByCreation, groupByFile, normalizeSortMode, nextSeq, adjustMarkLine, applyChanges, decideSetMark, reorderMarks, reorderNames,
   relocateLine, validateProjectName, uniqueName, parseStore, serializeStore,
 } = require('../lib');
 
@@ -120,6 +120,52 @@ t('validateProjectName', () => {
   assert.ok(validateProjectName('x'.repeat(41), []));
   assert.strictEqual(validateProjectName('x'.repeat(40), []), undefined);
   assert.ok(validateProjectName(undefined, []));
+});
+
+t('decideSetMark: new / toggle off on the same line / ask or replace elsewhere', () => {
+  const ex = { letter: 'q', uri: 'file:///a.c', line: 3, col: 1 };
+  assert.strictEqual(decideSetMark(undefined, 'file:///a.c', 3, true), 'new');
+  assert.strictEqual(decideSetMark(ex, 'file:///a.c', 3, true), 'remove'); // same file + line
+  assert.strictEqual(decideSetMark(ex, 'file:///a.c', 3, false), 'remove'); // also with the confirmation off
+  assert.strictEqual(decideSetMark(ex, 'file:///a.c', 4, true), 'ask'); // other line
+  assert.strictEqual(decideSetMark(ex, 'file:///b.c', 3, true), 'ask'); // same line number, other file
+  assert.strictEqual(decideSetMark(ex, 'file:///b.c', 9, false), 'replace'); // confirmation off
+});
+
+t('reorderMarks: dragging moves a mark to the target position and renumbers', () => {
+  const ms = [
+    { letter: 'a', seq: 1 },
+    { letter: 'q', seq: 2 },
+    { letter: 'B', seq: 3 },
+  ];
+  const letters = (arr) => arr.map((m) => m.letter);
+  const up = reorderMarks(ms, 'B', 'a'); // upwards: takes the target's place
+  assert.deepStrictEqual(letters(up), ['B', 'a', 'q']);
+  assert.deepStrictEqual(up.map((m) => m.seq), [1, 2, 3]);
+  assert.deepStrictEqual(letters(reorderMarks(ms, 'a', 'B')), ['q', 'B', 'a']); // downwards
+  assert.deepStrictEqual(letters(reorderMarks(ms, 'a')), ['q', 'B', 'a']); // no target: to the end
+  assert.strictEqual(reorderMarks(ms, 'a', 'a'), null); // onto itself
+  assert.strictEqual(reorderMarks(ms, 'B'), null); // already last
+  assert.strictEqual(reorderMarks(ms, 'z', 'a'), null); // unknown letter
+  assert.deepStrictEqual(letters(ms), ['a', 'q', 'B']); // input not mutated
+});
+
+t('reorderMarks works on the creation order even when the array is unsorted', () => {
+  const ms = [
+    { letter: 'B', seq: 3 },
+    { letter: 'a', seq: 1 },
+    { letter: 'q', seq: 2 },
+  ];
+  assert.deepStrictEqual(reorderMarks(ms, 'q', 'a').map((m) => m.letter), ['q', 'a', 'B']);
+});
+
+t('reorderNames: sections can be rearranged', () => {
+  assert.deepStrictEqual(reorderNames(['x', 'y', 'z'], 'z', 'x'), ['z', 'x', 'y']);
+  assert.deepStrictEqual(reorderNames(['x', 'y', 'z'], 'x', 'z'), ['y', 'z', 'x']);
+  assert.deepStrictEqual(reorderNames(['x', 'y', 'z'], 'x'), ['y', 'z', 'x']); // to the end
+  assert.strictEqual(reorderNames(['x', 'y'], 'x', 'x'), null);
+  assert.strictEqual(reorderNames(['x', 'y'], 'y'), null);
+  assert.strictEqual(reorderNames(['x', 'y'], 'nope', 'x'), null);
 });
 
 t('uniqueName: never returns a name that is already taken', () => {
