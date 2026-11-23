@@ -1,8 +1,8 @@
 {
   "name": "vim-marks-sidebar",
   "displayName": "Vim Marks Sidebar",
-  "description": "Vim-style global marks (a-z, A-Z) grouped into projects, with a sidebar list, gutter letters and persistent storage. Designed to be driven by VSCodeVim key bindings.",
-  "version": "0.6.0",
+  "description": "Vim-style global marks (a-z, A-Z) grouped into projects, with a sidebar list, gutter letters and persistent storage. Works with VSCodeVim key bindings and without Vim (Ctrl+Alt chords).",
+  "version": "0.7.0",
   "publisher": "local",
   "license": "MIT",
   "engines": {
@@ -1125,6 +1125,318 @@
         "key": ", p",
         "command": "vimMarks.switchProject",
         "when": "vim.active && vim.mode == 'Normal'"
+      },
+      {
+        "key": "ctrl+alt+k a",
+        "command": "vimMarks.set",
+        "args": "a",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k b",
+        "command": "vimMarks.set",
+        "args": "b",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k c",
+        "command": "vimMarks.set",
+        "args": "c",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k d",
+        "command": "vimMarks.set",
+        "args": "d",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k e",
+        "command": "vimMarks.set",
+        "args": "e",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k f",
+        "command": "vimMarks.set",
+        "args": "f",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k g",
+        "command": "vimMarks.set",
+        "args": "g",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k h",
+        "command": "vimMarks.set",
+        "args": "h",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k i",
+        "command": "vimMarks.set",
+        "args": "i",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k j",
+        "command": "vimMarks.set",
+        "args": "j",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k k",
+        "command": "vimMarks.set",
+        "args": "k",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k l",
+        "command": "vimMarks.set",
+        "args": "l",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k m",
+        "command": "vimMarks.set",
+        "args": "m",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k n",
+        "command": "vimMarks.set",
+        "args": "n",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k o",
+        "command": "vimMarks.set",
+        "args": "o",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k p",
+        "command": "vimMarks.set",
+        "args": "p",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k q",
+        "command": "vimMarks.set",
+        "args": "q",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k r",
+        "command": "vimMarks.set",
+        "args": "r",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k s",
+        "command": "vimMarks.set",
+        "args": "s",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k t",
+        "command": "vimMarks.set",
+        "args": "t",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k u",
+        "command": "vimMarks.set",
+        "args": "u",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k v",
+        "command": "vimMarks.set",
+        "args": "v",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k w",
+        "command": "vimMarks.set",
+        "args": "w",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k x",
+        "command": "vimMarks.set",
+        "args": "x",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k y",
+        "command": "vimMarks.set",
+        "args": "y",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k z",
+        "command": "vimMarks.set",
+        "args": "z",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+a",
+        "command": "vimMarks.set",
+        "args": "A",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+b",
+        "command": "vimMarks.set",
+        "args": "B",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+c",
+        "command": "vimMarks.set",
+        "args": "C",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+d",
+        "command": "vimMarks.set",
+        "args": "D",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+e",
+        "command": "vimMarks.set",
+        "args": "E",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+f",
+        "command": "vimMarks.set",
+        "args": "F",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+g",
+        "command": "vimMarks.set",
+        "args": "G",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+h",
+        "command": "vimMarks.set",
+        "args": "H",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+i",
+        "command": "vimMarks.set",
+        "args": "I",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+j",
+        "command": "vimMarks.set",
+        "args": "J",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+k",
+        "command": "vimMarks.set",
+        "args": "K",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+l",
+        "command": "vimMarks.set",
+        "args": "L",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+m",
+        "command": "vimMarks.set",
+        "args": "M",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+n",
+        "command": "vimMarks.set",
+        "args": "N",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+o",
+        "command": "vimMarks.set",
+        "args": "O",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+p",
+        "command": "vimMarks.set",
+        "args": "P",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+q",
+        "command": "vimMarks.set",
+        "args": "Q",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+r",
+        "command": "vimMarks.set",
+        "args": "R",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+s",
+        "command": "vimMarks.set",
+        "args": "S",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+t",
+        "command": "vimMarks.set",
+        "args": "T",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+u",
+        "command": "vimMarks.set",
+        "args": "U",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+v",
+        "command": "vimMarks.set",
+        "args": "V",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+w",
+        "command": "vimMarks.set",
+        "args": "W",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+x",
+        "command": "vimMarks.set",
+        "args": "X",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+y",
+        "command": "vimMarks.set",
+        "args": "Y",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+k shift+z",
+        "command": "vimMarks.set",
+        "args": "Z",
+        "when": "editorTextFocus"
       }
     ]
   }

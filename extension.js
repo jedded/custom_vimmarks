@@ -310,7 +310,9 @@ function refreshView() {
     (sortMode === 'created' ? 'creation order' : 'grouped by file') +
     ` · overwrite: ${confirmOverwrite ? 'ask' : 'no ask'}`;
   const any = order.some((p) => (data[p] || []).length);
-  treeView.message = any ? undefined : 'No marks yet. In normal mode press m{letter} to set one.';
+  treeView.message = any
+    ? undefined
+    : 'No marks yet. Press Ctrl+Alt+K and then a letter (or m{letter} in Vim normal mode) to set one.';
   statusItem.text = `$(bookmark) ${activeProject}`;
   statusItem.tooltip = `Vim Marks project: ${activeProject} (${curMarks().length} marks). Click to switch.`;
 }
