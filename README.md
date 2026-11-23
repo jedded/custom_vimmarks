@@ -1,7 +1,7 @@
 # Vim Marks Sidebar
 
 **전역 마크(a-z, A-Z)** 를 **프로젝트 단위로 묶어서** 사이드바에 계속 보여 줍니다.
-VSCodeVim 일반 모드에서는 `m` + 글자로, vim이 없거나 꺼져 있을 때는 `Ctrl+Alt+K` → 글자로 마크합니다. `Ctrl+Alt+K`는 vim이 켜져 있어도(Insert 모드 포함) 동작합니다.
+VSCodeVim 일반 모드에서는 `m` + 글자로, vim이 없거나 꺼져 있을 때는 `Ctrl+Alt+K` → 글자로 마크하고 `Ctrl+Alt+J` → 글자로 이동합니다. 이 두 키는 vim이 켜져 있어도(Insert 모드 포함) 동작합니다.
 단축키는 확장에 내장되어 있어서 `settings.json`을 수정할 필요가 없습니다.
 
 - 모든 글자가 전역 마크입니다. 다른 파일로도 이동합니다.
@@ -48,8 +48,9 @@ VSCodeVim 일반 모드에서는 `m` + 글자로, vim이 없거나 꺼져 있을
 | 키 | 동작 |
 |---|---|
 | `Ctrl+Alt+K` → 글자 | 선택된 프로젝트에 마크. `m` + 글자와 같습니다 (예: `Ctrl+Alt+K` `q`, 대문자는 `Ctrl+Alt+K` `Shift+Q`) |
+| `Ctrl+Alt+J` → 글자 | 마크한 정확한 위치로 이동. `` ` `` + 글자와 같습니다 |
 
-`Ctrl+Alt+K`를 누르면 상태 표시줄에 두 번째 키를 기다린다는 표시가 뜹니다. 글자가 아닌 키(예: `Esc`)를 누르면 아무 일도 하지 않고 끝납니다.
+`Ctrl+Alt+K`나 `Ctrl+Alt+J`를 누르면 상태 표시줄에 두 번째 키를 기다린다는 표시가 뜹니다. 글자가 아닌 키(예: `Esc`)를 누르면 아무 일도 하지 않고 끝납니다.
 
 ### VSCodeVim 일반 모드
 
@@ -74,7 +75,7 @@ WSL/SSH로 접속한 창에서는 접속한 쪽(서버)의 저장 폴더에 저�
 
 - 사용자 `keybindings.json`이 확장 내장 단축키보다 우선합니다.
 - 내장 단축키를 끄려면 `-`를 붙인 항목을 넣으세요. 예: `{ "key": ", z", "command": "-vimMarks.toggleSort" }`
-- 다른 확장도 `Ctrl+Alt+K`를 쓰면(예: Bookmarks, Claude Code) 어느 쪽이 동작할지 정해져 있지 않습니다. 쓰지 않을 쪽을 `-`로 끄세요. 예: `{ "key": "ctrl+alt+k", "command": "-claude-code.insertAtMentioned" }`
+- 다른 확장도 `Ctrl+Alt+K`·`Ctrl+Alt+J`를 쓰면(예: Bookmarks는 둘 다, Claude Code는 `Ctrl+Alt+K`) 어느 쪽이 동작할지 정해져 있지 않습니다. 쓰지 않을 쪽을 `-`로 끄세요. 예: `{ "key": "ctrl+alt+k", "command": "-claude-code.insertAtMentioned" }`
 - 내장 단축키 목록은 `scripts/gen_keybindings.py`로 다시 생성합니다.
 
 ## 개발

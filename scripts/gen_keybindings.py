@@ -41,6 +41,10 @@ bindings.append({"key": ", p", "command": "vimMarks.switchProject", "when": WHEN
 for l in LETTERS:
     bindings.append({"key": f"ctrl+alt+k {key_name(l)}", "command": "vimMarks.set", "args": l, "when": WHEN_ALWAYS})
 
+# Without Vim: Ctrl+Alt+J, then the letter (same as ` + letter: back to the exact position)
+for l in LETTERS:
+    bindings.append({"key": f"ctrl+alt+j {key_name(l)}", "command": "vimMarks.jumpExact", "args": l, "when": WHEN_ALWAYS})
+
 pkg["contributes"]["keybindings"] = bindings
 with open(path, "w", encoding="utf-8") as f:
     json.dump(pkg, f, indent=2, ensure_ascii=False)

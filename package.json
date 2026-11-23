@@ -1437,6 +1437,318 @@
         "command": "vimMarks.set",
         "args": "Z",
         "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j a",
+        "command": "vimMarks.jumpExact",
+        "args": "a",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j b",
+        "command": "vimMarks.jumpExact",
+        "args": "b",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j c",
+        "command": "vimMarks.jumpExact",
+        "args": "c",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j d",
+        "command": "vimMarks.jumpExact",
+        "args": "d",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j e",
+        "command": "vimMarks.jumpExact",
+        "args": "e",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j f",
+        "command": "vimMarks.jumpExact",
+        "args": "f",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j g",
+        "command": "vimMarks.jumpExact",
+        "args": "g",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j h",
+        "command": "vimMarks.jumpExact",
+        "args": "h",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j i",
+        "command": "vimMarks.jumpExact",
+        "args": "i",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j j",
+        "command": "vimMarks.jumpExact",
+        "args": "j",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j k",
+        "command": "vimMarks.jumpExact",
+        "args": "k",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j l",
+        "command": "vimMarks.jumpExact",
+        "args": "l",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j m",
+        "command": "vimMarks.jumpExact",
+        "args": "m",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j n",
+        "command": "vimMarks.jumpExact",
+        "args": "n",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j o",
+        "command": "vimMarks.jumpExact",
+        "args": "o",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j p",
+        "command": "vimMarks.jumpExact",
+        "args": "p",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j q",
+        "command": "vimMarks.jumpExact",
+        "args": "q",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j r",
+        "command": "vimMarks.jumpExact",
+        "args": "r",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j s",
+        "command": "vimMarks.jumpExact",
+        "args": "s",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j t",
+        "command": "vimMarks.jumpExact",
+        "args": "t",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j u",
+        "command": "vimMarks.jumpExact",
+        "args": "u",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j v",
+        "command": "vimMarks.jumpExact",
+        "args": "v",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j w",
+        "command": "vimMarks.jumpExact",
+        "args": "w",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j x",
+        "command": "vimMarks.jumpExact",
+        "args": "x",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j y",
+        "command": "vimMarks.jumpExact",
+        "args": "y",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j z",
+        "command": "vimMarks.jumpExact",
+        "args": "z",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+a",
+        "command": "vimMarks.jumpExact",
+        "args": "A",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+b",
+        "command": "vimMarks.jumpExact",
+        "args": "B",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+c",
+        "command": "vimMarks.jumpExact",
+        "args": "C",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+d",
+        "command": "vimMarks.jumpExact",
+        "args": "D",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+e",
+        "command": "vimMarks.jumpExact",
+        "args": "E",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+f",
+        "command": "vimMarks.jumpExact",
+        "args": "F",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+g",
+        "command": "vimMarks.jumpExact",
+        "args": "G",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+h",
+        "command": "vimMarks.jumpExact",
+        "args": "H",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+i",
+        "command": "vimMarks.jumpExact",
+        "args": "I",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+j",
+        "command": "vimMarks.jumpExact",
+        "args": "J",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+k",
+        "command": "vimMarks.jumpExact",
+        "args": "K",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+l",
+        "command": "vimMarks.jumpExact",
+        "args": "L",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+m",
+        "command": "vimMarks.jumpExact",
+        "args": "M",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+n",
+        "command": "vimMarks.jumpExact",
+        "args": "N",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+o",
+        "command": "vimMarks.jumpExact",
+        "args": "O",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+p",
+        "command": "vimMarks.jumpExact",
+        "args": "P",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+q",
+        "command": "vimMarks.jumpExact",
+        "args": "Q",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+r",
+        "command": "vimMarks.jumpExact",
+        "args": "R",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+s",
+        "command": "vimMarks.jumpExact",
+        "args": "S",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+t",
+        "command": "vimMarks.jumpExact",
+        "args": "T",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+u",
+        "command": "vimMarks.jumpExact",
+        "args": "U",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+v",
+        "command": "vimMarks.jumpExact",
+        "args": "V",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+w",
+        "command": "vimMarks.jumpExact",
+        "args": "W",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+x",
+        "command": "vimMarks.jumpExact",
+        "args": "X",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+y",
+        "command": "vimMarks.jumpExact",
+        "args": "Y",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+alt+j shift+z",
+        "command": "vimMarks.jumpExact",
+        "args": "Z",
+        "when": "editorTextFocus"
       }
     ]
   }

@@ -42,4 +42,18 @@ for (const l of LETTERS) {
 }
 ok('ctrl+alt+k <letter> sets the same mark as m <letter> (a-z, A-Z), only needs editor focus');
 
+// Without Vim: Ctrl+Alt+J, then the letter = ` + letter (back to the exact position).
+for (const l of LETTERS) {
+  const k = keyName(l);
+  const mine = find(`ctrl+alt+j ${k}`);
+  assert.strictEqual(mine.length, 1, `ctrl+alt+j ${k}`);
+  assert.deepStrictEqual(
+    { command: mine[0].command, args: mine[0].args, when: mine[0].when },
+    { command: 'vimMarks.jumpExact', args: l, when: 'editorTextFocus' }
+  );
+  const vim = find('` ' + k);
+  assert.ok(vim.length === 1 && vim[0].command === mine[0].command && vim[0].args === mine[0].args, '` ' + k);
+}
+ok('ctrl+alt+j <letter> jumps like ` <letter> (a-z, A-Z), only needs editor focus');
+
 console.log(`\nkeys test passed (${n} checks)`);
